@@ -25,7 +25,32 @@ posVisited = []
 actionsPerformed = []
 step = 0
 
-epsilon = 0.5
+epsilon = 0.4
+
+def printState():
+    for x in range(mapSize):
+        for y in range(mapSize):
+            if state[x][y] == 0:
+                print("_ ",end="")
+            if state[x][y] == 1:
+                print("I ",end="")
+            if state[x][y] == 2:
+                print("X ",end="")
+            if state[x][y] == 3:
+                print("O ",end="")
+        print("")
+
+def setState():
+    global state 
+    state = np.zeros((mapSize,mapSize))
+    state[4][0] = 2
+    state[4][1] = 2
+    state[4][2] = 2
+    state[4][3] = 2
+    state[mapSize-1][0] = 3
+
+
+setState()
 
 while True:
     step+=1
@@ -41,22 +66,22 @@ while True:
     posVisited.append([currentPos[0],currentPos[1]])
     
     if action == move.up.value and currentPos[0] < mapSize-1:
-        state = np.zeros((mapSize,mapSize))
+        setState()
         currentPos[0]+=1
         state[currentPos[0],currentPos[1]] = 1 
     
     if action == move.down.value and currentPos[0] > 0:
-        state = np.zeros((mapSize,mapSize))
+        setState()
         currentPos[0]-=1
         state[currentPos[0],currentPos[1]] = 1
         
     if action == move.left.value and currentPos[1] > 0:
-        state = np.zeros((mapSize,mapSize))
+        setState()
         currentPos[1]-=1
         state[currentPos[0],currentPos[1]] = 1
         
     if action == move.right.value and currentPos[1] < mapSize-1:
-        state = np.zeros((mapSize,mapSize))
+        setState()
         currentPos[1]+=1
         state[currentPos[0],currentPos[1]] = 1
     
@@ -68,25 +93,40 @@ while True:
     
     # print(actionsPerformed)
     # print(posVisited)
-    if step > 100000:
+    if step > 500000:
         os.system('cls')
         
-        epsilon = 1
-        print(state)
+        epsilon = 0.9
+        printState()
     
         #print(qtable)
         time.sleep(0.3)
     
     #goal reached
-    if (currentPos==np.array([mapSize-1,mapSize-1])).all():
+    if (currentPos==np.array([mapSize-1,0])).all():
         #update q table
-        print("Goooooooooooooooal")
+        #print("Goooooooooooooooal")
         for i,ac in enumerate(actionsPerformed):
             
             qtable[ac,posVisited[i][0],posVisited[i][1]]=qtable[ac,posVisited[i][0],posVisited[i][1]]+(1/len(actionsPerformed))*((1/len(actionsPerformed))-qtable[ac,posVisited[i][0],posVisited[i][1]])
             
         #reset
-        state = np.zeros((mapSize,mapSize))
+        setState()
+        state[0,0] = 1
+        currentPos = np.array([0,0])
+        posVisited = []
+        actionsPerformed = []
+    
+    #x touched
+    if (currentPos==np.array([4,0])).all() or (currentPos==np.array([4,1])).all() or (currentPos==np.array([4,2])).all() or (currentPos==np.array([4,3])).all():
+        #update q table
+        
+        for i,ac in enumerate(actionsPerformed):
+            
+            qtable[ac,posVisited[i][0],posVisited[i][1]]=qtable[ac,posVisited[i][0],posVisited[i][1]]+(1/len(actionsPerformed))*((0)-qtable[ac,posVisited[i][0],posVisited[i][1]])
+            
+        #reset
+        setState()
         state[0,0] = 1
         currentPos = np.array([0,0])
         posVisited = []
