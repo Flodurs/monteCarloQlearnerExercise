@@ -25,7 +25,7 @@ posVisited = []
 actionsPerformed = []
 step = 0
 
-epsilon = 0.4
+epsilon = 0.5
 
 def printState():
     for x in range(mapSize):
@@ -122,7 +122,6 @@ while True:
         #update q table
         
         for i,ac in enumerate(actionsPerformed):
-            
             qtable[ac,posVisited[i][0],posVisited[i][1]]=qtable[ac,posVisited[i][0],posVisited[i][1]]+(1/len(actionsPerformed))*((0)-qtable[ac,posVisited[i][0],posVisited[i][1]])
             
         #reset
